@@ -26,5 +26,6 @@ autoInstallPeers: true
 # Lifecycle-script allow-list. pnpm 10 blocks postinstall scripts by default;
 # we add packages here only after explicit review. Keep this list short.
 onlyBuiltDependencies:
+  - "@nestjs/core"   # NestJS runtime CLI registration
   - "@swc/core"      # native bindings for SWC compiler used by Nx
   - "nx"             # workspace daemon and CLI setup
