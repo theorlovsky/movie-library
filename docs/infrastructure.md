@@ -45,7 +45,8 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test:
+        ['CMD', 'pg_isready', '-U', '${POSTGRES_USER}', '-d', '${POSTGRES_DB}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -70,10 +71,10 @@ services:
       OMDB_API_KEY: ${OMDB_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       SENTRY_DSN: ${SENTRY_DSN_API}
-      SWAGGER_ENABLED: "false"
+      SWAGGER_ENABLED: 'false'
       CORS_ORIGIN: https://${DOMAIN}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -91,8 +92,8 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy-data:/data
@@ -168,9 +169,9 @@ POSTGRES_DB=movie_library
 JWT_ACCESS_SECRET=<openssl rand -base64 64>
 JWT_REFRESH_SECRET=<openssl rand -base64 64>
 
-TMDB_API_KEY=<your TMDB key>
-OMDB_API_KEY=<your OMDb key>
-ANTHROPIC_API_KEY=<sk-ant-...>
+TMDB_API_KEY=<your-tmdb-api-key>
+OMDB_API_KEY=<your-omdb-api-key>
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
 
 SENTRY_DSN_API=https://...@sentry.io/...
 SENTRY_DSN_WEB=https://...@sentry.io/...
@@ -180,6 +181,7 @@ REGISTRATION_ENABLED=true
 ```
 
 How to generate strong secrets:
+
 ```bash
 openssl rand -base64 32   # for passwords
 openssl rand -base64 64   # for JWT secrets
@@ -364,6 +366,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +7 -delete
 ```
 
 Crontab:
+
 ```bash
 crontab -e
 
@@ -372,6 +375,7 @@ crontab -e
 ```
 
 Install rclone and connect a cloud provider:
+
 ```bash
 sudo apt install rclone
 rclone config
