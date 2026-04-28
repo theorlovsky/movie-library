@@ -1,109 +1,142 @@
-# MovieLibrary
+# Movie Library
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Personal PWA for tracking your film library: what you've watched, what you want to watch, ratings from you and your viewing partner, filters by genre / country / year / score, AI-powered recommendations.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Stack
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+| Layer            | Choice                                              |
+|------------------|-----------------------------------------------------|
+| Frontend         | Angular 19+ (standalone, signals, control flow)     |
+| UI Kit           | Taiga UI v5 (components + design tokens)            |
+| Utility styles   | Tailwind CSS (layout/spacing only, preflight off)   |
+| State            | NgRx Signal Stores                                  |
+| Forms            | Angular Signal Forms                                |
+| i18n             | Transloco (`en` / `ru` / `uk`)                      |
+| PWA              | `@angular/pwa` (Service Worker + app shell)         |
+| Monorepo         | Nx 22+                                              |
+| Backend          | NestJS 10+                                          |
+| ORM              | Prisma 5+                                           |
+| Database         | PostgreSQL 16                                       |
+| Auth             | JWT (access + refresh), Passport, bcrypt            |
+| External APIs    | TMDB, OMDb, Anthropic (Claude Haiku)                |
+| Observability    | Sentry (`@sentry/angular`, `@sentry/nestjs`)        |
+| Tests            | Vitest (unit), Playwright (e2e)                     |
+| Containerization | Docker + Docker Compose                             |
+| Reverse proxy    | Caddy 2 (auto-HTTPS via Let's Encrypt)              |
+| CI/CD            | GitHub Actions + GHCR                               |
+| Hosting          | Hostinger VPS (KVM)                                 |
 
-## Generate a library
-
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
-
-## Run tasks
-
-To build the library use:
-
-```sh
-npx nx build pkg1
-```
-
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
+## Workspace structure
 
 ```
-npx nx release
+movie-library/
+├── apps/
+│   ├── web/                  Angular SPA + PWA
+│   ├── web-e2e/              Playwright e2e
+│   └── api/                  NestJS API
+├── packages/
+│   ├── shared/
+│   │   ├── domain/           DTOs, enums, common interfaces
+│   │   └── api-types/        OpenAPI-generated types
+│   ├── web/
+│   │   ├── feature-auth/
+│   │   ├── feature-library/
+│   │   ├── feature-wishlist/
+│   │   ├── feature-suggest/
+│   │   ├── feature-movie/
+│   │   ├── feature-friends/
+│   │   ├── data-access/      HTTP clients, signal stores
+│   │   └── ui/               Reusable app-specific components
+│   └── api/
+│       ├── feature-auth/
+│       ├── feature-movies/
+│       ├── feature-library/
+│       ├── feature-wishlist/
+│       ├── feature-friends/
+│       ├── feature-suggestions/
+│       ├── data-access-tmdb/
+│       ├── data-access-omdb/
+│       ├── data-access-ai/
+│       └── data-access-db/   Prisma client wrapper
+├── docker/
+│   ├── api.Dockerfile
+│   └── web.Dockerfile
+├── deploy/
+│   ├── docker-compose.yml         Production stack for VPS
+│   ├── docker-compose.dev.yml     Local Postgres only
+│   └── Caddyfile
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+└── docs/
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+## Quick start (local development)
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Detailed instructions are in [docs/local-development.md](./docs/local-development.md). The short version:
 
-## Keep TypeScript project references up to date
+```bash
+# 1. Install dependencies
+pnpm install
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+# 2. Create your local .env from the template
+cp .env.example .env
+# Edit .env and fill in TMDB_API_KEY, OMDB_API_KEY, ANTHROPIC_API_KEY
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+# 3. Start local PostgreSQL via Docker
+docker compose -f deploy/docker-compose.dev.yml up -d
 
-```sh
-npx nx sync
+# 4. Apply migrations and seed reference data
+pnpm prisma migrate dev
+pnpm prisma db seed
+
+# 5. Run API and web in parallel
+pnpm nx run-many -t serve -p api,web
+# API → http://localhost:3000
+# Web → http://localhost:4200
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Common Nx commands:
 
-```sh
-npx nx sync:check
+```bash
+pnpm nx serve api                          # API only
+pnpm nx serve web                          # frontend only
+pnpm nx run-many -t test                   # all unit tests (Vitest)
+pnpm nx run-many -t lint                   # all linters
+pnpm nx run-many -t build --configuration=production
+pnpm nx graph                              # interactive dependency graph
+pnpm nx sync                                # sync TypeScript project references
+pnpm prisma studio                         # admin UI for the local DB
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+> **Tip:** install **Nx Console** (VSCode / IntelliJ extension). It gives you generators, target runners, and the project graph as a sidebar — much faster than typing `nx g ...` manually. Get it at [nx.dev/getting-started/editor-setup](https://nx.dev/getting-started/editor-setup).
 
-## Set up CI!
+## Documentation
 
-### Step 1
+| File                                                              | About                                                      |
+|-------------------------------------------------------------------|------------------------------------------------------------|
+| [CLAUDE.md](./CLAUDE.md)                                          | Context and conventions for Claude Code                    |
+| [docs/local-development.md](./docs/local-development.md)          | Local environment setup, `.env`, dev commands, tips        |
+| [docs/architecture.md](./docs/architecture.md)                    | Stack decisions, Nx layout, why no SSR                     |
+| [docs/data-model.md](./docs/data-model.md)                        | Full Prisma schema with rationale                          |
+| [docs/api.md](./docs/api.md)                                      | REST API: endpoints, auth flow, error format               |
+| [docs/frontend.md](./docs/frontend.md)                            | Routes, libraries, signal stores, PWA, SSG, Taiga UI       |
+| [docs/ai-suggestions.md](./docs/ai-suggestions.md)                | LLM recommendations: context, prompt, parsing              |
+| [docs/infrastructure.md](./docs/infrastructure.md)                | VPS, Docker Compose, Caddy, backups, secrets               |
+| [docs/ci-cd.md](./docs/ci-cd.md)                                  | GitHub Actions: build, push to GHCR, deploy to VPS         |
+| [docs/roadmap.md](./docs/roadmap.md)                              | Phased MVP plan                                            |
 
-To connect to Nx Cloud, run the following command:
+## External keys and accounts
 
-```sh
-npx nx connect
-```
+The following free API keys are required:
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+- **TMDB** — themoviedb.org → Settings → API → Create. Practically no rate limits for personal use.
+- **OMDb** — omdbapi.com → free tier 1000 requests/day. Used only to fetch IMDb ratings by `imdb_id` (aggressively cached).
+- **Anthropic** — console.anthropic.com → API Keys. Default model: `claude-haiku-4-5`. Cost per recommendation is around $0.001.
+- **Sentry** (optional but recommended) — sentry.io → Create Project (Angular + Node, two separate projects).
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+All keys live in `.env` files (one local, one on the VPS). Only `.env.example` is committed to the repo, with placeholder values.
