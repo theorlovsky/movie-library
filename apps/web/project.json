@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@movie-library/web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "ml",
@@ -51,10 +51,10 @@
       "executor": "@angular/build:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "web:build:production"
+          "buildTarget": "@movie-library/web:build:production"
         },
         "development": {
-          "buildTarget": "web:build:development"
+          "buildTarget": "@movie-library/web:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -70,7 +70,7 @@
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "web:build",
+        "buildTarget": "@movie-library/web:build",
         "port": 4200,
         "staticFilePath": "dist/apps/web/browser",
         "spa": true
