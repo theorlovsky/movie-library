@@ -79,3 +79,6 @@ dumps/
 # Merge conflict leftovers
 *.orig
 *.rej
+
+vite.config.*.timestamp*
+.angular
