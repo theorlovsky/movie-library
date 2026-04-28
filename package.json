@@ -37,7 +37,7 @@
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.5",
     "@swc/helpers": "~0.5.18",
-    "@types/node": "20.19.9",
+    "@types/node": "24.12.2",
     "@typescript-eslint/utils": "^7.16.0",
     "@vitest/ui": "~4.1.0",
     "eslint": "~8.57.0",
