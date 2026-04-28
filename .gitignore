@@ -52,3 +52,33 @@ Thumbs.db
 .env.development
 .env.production
 !.env.example
+
+# Playwright (e2e)
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Caches
+.eslintcache
+
+# Sentry CLI (may contain auth token if you ever run it locally)
+.sentryclirc
+
+# Editor / OS extras Nx didn't cover
+*.swp
+*.swo
+*~
+.AppleDouble
+.LSOverride
+
+# Local database dumps & backup artifacts
+backups/
+dumps/
+*.sql
+*.sql.gz
+*.dump
+
+# Merge conflict leftovers
+*.orig
+*.rej
