@@ -82,3 +82,7 @@ dumps/
 
 vite.config.*.timestamp*
 .angular
+
+__screenshots__/
+
+test-output
