@@ -83,6 +83,14 @@ This is the current Nx 22+ recommendation for workspaces using TypeScript Projec
 
 Import names are independent of the folder — they come from the `name` field in each project's `package.json` (e.g. `@movie-library/shared/domain`).
 
+#### Caveat: TypeScript Project References + Angular
+
+Angular's compiler [doesn't support TypeScript Project References](https://github.com/angular/angular/issues/37276). The `@nx/angular:init` generator refuses to run in a TS-references workspace unless you set `NX_IGNORE_UNSUPPORTED_TS_SETUP=true` (committed in `/.env` at the repo root).
+
+The flag silences the **warning** but doesn't fix the **inheritance**: Angular apps still pick up `composite: true`, `emitDeclarationOnly: true`, and `lib: ["es2022"]` from `tsconfig.base.json`, none of which Angular's compiler tolerates. The fix is per-app: `apps/web/tsconfig.json` overrides those three settings (`composite: false`, `emitDeclarationOnly: false`, `lib: ["es2022", "dom"]`) so the Angular toolchain can build cleanly while the rest of the monorepo (NestJS, shared packages) keeps the project-references benefits.
+
+In practice: NestJS, shared libs, and any future Node packages get fast incremental TS builds and proper cross-package types via project references. Angular apps and Angular libs use their own non-reference `tsconfig.app.json` / `tsconfig.lib.json` — which is the standard Angular pattern anyway.
+
 ### Why signal stores instead of classic NgRx
 
 The project is small, effects are rare. Signal store gives you 90% of NgRx's capabilities in 20% of the code. No actions/reducers/selectors — just `signalStore + withState + withMethods`. Compatible with devtools (`withDevtools()` from `@ngrx/signals`).
