@@ -46,12 +46,9 @@ Thumbs.db
 .nx/polygraph
 
 # Environment files
-.env
-.env.local
-.env.*.local
-.env.development
-.env.production
-!.env.example
+# Commit non-secret defaults (.env, .env.development, .env.production).
+# Real secrets live in .local variants which are gitignored.
+.env*.local
 
 # Playwright (e2e)
 playwright-report/
@@ -82,3 +79,12 @@ dumps/
 # Merge conflict leftovers
 *.orig
 *.rej
+
+vite.config.*.timestamp*
+.angular
+
+__screenshots__/
+
+test-output
+
+vitest.config.*.timestamp*

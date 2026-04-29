@@ -1,4 +1,31 @@
 packages:
+  - "apps/*"
   - "packages/*"
 
+# Supply-chain hardening
+# https://pnpm.io/settings
+
+# No `^` or `~` on installed deps — every version is exact.
+# Caret ranges are how compromised patch releases reach you automatically.
+savePrefix: ""
+
+# Refuse to install package versions newer than this many minutes.
+# 10080 = 7 days. Most malicious republishes (compromised maintainer accounts,
+# typo-squats) are detected and yanked within 48-72h.
+minimumReleaseAge: 10080
+
+# Validate every file in the content-addressable store before linking.
+verifyStoreIntegrity: true
+
+# Refuse installs when a package's `engines.node` does not match the local Node.
+engineStrict: true
+
+# Auto-install peers — keeps Angular/NestJS peer chains deterministic.
 autoInstallPeers: true
+
+# Lifecycle-script allow-list. pnpm 10 blocks postinstall scripts by default;
+# we add packages here only after explicit review. Keep this list short.
+onlyBuiltDependencies:
+  - "@nestjs/core"   # NestJS runtime CLI registration
+  - "@swc/core"      # native bindings for SWC compiler used by Nx
+  - "nx"             # workspace daemon and CLI setup

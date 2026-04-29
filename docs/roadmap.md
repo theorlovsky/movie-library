@@ -63,12 +63,12 @@ Phased plan for the MVP. Every phase ends with a **working deployment to the VPS
 - [ ] `packages/web/feature-library`:
   - `LibraryStore` with filters and pagination.
   - Page `/library` — card list with virtualization (`@angular/cdk/scrolling`).
-  - `<lib-filter-bar>` — genres / countries / min score / year / viewing mode. Two-way signal binding.
+  - `<ml-filter-bar>` — genres / countries / min score / year / viewing mode. Two-way signal binding.
   - Page `/library/:id` — entry detail.
 - [ ] `packages/web/feature-movie`:
   - Page `/movies/:id` — poster, overview, TMDB+IMDb ratings, "Add to library" / "Add to wishlist".
 - [ ] `packages/web/ui`:
-  - Only app-specific bits: `<lib-rating-input>` (10-point slider), `<lib-movie-poster>`, `<lib-filter-bar>`. Buttons / cards / modals come from Taiga UI directly at use-sites.
+  - Only app-specific bits: `<ml-rating-input>` (10-point slider), `<ml-movie-poster>`, `<ml-filter-bar>`. Buttons / cards / modals come from Taiga UI directly at use-sites.
 - [ ] Search dialog (accessible from any page via FAB or keyboard shortcut) — TMDB search with 300ms debounce, posters from CDN.
 - [ ] Loading / error states everywhere (you usually do this through `GlobalErrorHandler` + Sentry — wire up Sentry from day one).
 

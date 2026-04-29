@@ -180,7 +180,7 @@ In the component:
 
 ```typescript
 @Component({
-  selector: 'lib-library-list',
+  selector: 'ml-library-list',
   standalone: true,
   imports: [FilterBarComponent, LibraryCardComponent],
   templateUrl: './library-list.component.html',
@@ -193,7 +193,7 @@ export class LibraryListComponent {
 In the template, signal accessors are read directly:
 
 ```html
-<lib-filter-bar
+<ml-filter-bar
   [filters]="store.filters()"
   (filterChange)="store.setFilter($event.key, $event.value)"
 />
@@ -204,7 +204,7 @@ In the template, signal accessors are read directly:
   <div class="empty-state">Your library is empty. Add the first movie.</div>
 } @else {
   @for (entry of store.entries(); track entry.id) {
-    <lib-library-card [entry]="entry" />
+    <ml-library-card [entry]="entry" />
   }
 }
 ```
@@ -555,7 +555,7 @@ import { TuiBadge } from '@taiga-ui/kit';
 import type { WatchedEntryDto } from '@movie-library/shared/domain';
 
 @Component({
-  selector: 'lib-library-card',
+  selector: 'ml-library-card',
   standalone: true,
   imports: [TuiCard, TuiAvatar, TuiButton, TuiIcon, TuiBadge],
   template: `

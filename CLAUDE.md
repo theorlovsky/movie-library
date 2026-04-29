@@ -1,7 +1,7 @@
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
-# General Guidelines for working with Nx
+## General Guidelines for working with Nx
 
 - For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
 - When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
@@ -45,20 +45,20 @@ A personal PWA for tracking a film library. Multi-user (me + my wife + potential
 
 ## Where things live
 
-| Type of task                          | Where to work                                                                       |
-|---------------------------------------|-------------------------------------------------------------------------------------|
-| New API endpoint                      | `packages/api/feature-<domain>/` + controller wired in `apps/api/src/`              |
-| New Angular route                     | `packages/web/feature-<name>/` + registration in `apps/web/src/app/app.routes.ts`   |
-| DTO/interface shared between frontend and backend | `packages/shared/domain/`                                               |
-| Database schema change                | `prisma/schema.prisma` + `pnpm prisma migrate dev --name <description>`             |
-| Docker config                         | `docker/`, `deploy/docker-compose.yml`                                              |
-| CI/CD                                 | `.github/workflows/`                                                                |
+| Type of task                                      | Where to work                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------- |
+| New API endpoint                                  | `packages/api/feature-<domain>/` + controller wired in `apps/api/src/`            |
+| New Angular route                                 | `packages/web/feature-<name>/` + registration in `apps/web/src/app/app.routes.ts` |
+| DTO/interface shared between frontend and backend | `packages/shared/domain/`                                                         |
+| Database schema change                            | `prisma/schema.prisma` + `pnpm prisma migrate dev --name <description>`           |
+| Docker config                                     | `docker/`, `deploy/docker-compose.yml`                                            |
+| CI/CD                                             | `.github/workflows/`                                                              |
 
 ## Code conventions
 
 - **Imports** — absolute, via `@movie-library/...` aliases (configured by Nx in `tsconfig.base.json`). No `../../../` paths.
 - **Library file structure** — each library has `src/lib/<feature>.routes.ts` for feature libs (we are standalone, no NgModules). Public API exported via `src/index.ts`.
-- **Naming** — Angular files: `kebab-case`, classes: `PascalCase`. Suffix `.component.ts`, `.service.ts`, `.store.ts`, `.guard.ts`, `.interceptor.ts`.
+- **Naming** — Angular files: `kebab-case`, classes: `PascalCase`. Angular 19+ dropped the `.component.ts` suffix — components are just `<name>.ts` / `<name>.html` / `<name>.scss` (e.g. `app.ts`, `movie-poster.ts`). Keep the suffix for everything else: `.service.ts`, `.store.ts`, `.guard.ts`, `.interceptor.ts`, `.pipe.ts`, `.directive.ts`.
 - **Errors on the backend** — throw `HttpException` subclasses (`BadRequestException`, `NotFoundException`, etc.). Anything uncaught flows into `GlobalExceptionFilter`, gets sent to Sentry, and returned to the client as `{ statusCode, message, error }`.
 - **Errors on the frontend** — `GlobalErrorHandler` → Sentry. HTTP errors flow through `errorInterceptor`, which transforms backend responses into a typed `ApiError`.
 - **Logs** — `pino` via `nestjs-pino` on the backend. On the frontend — `console.*` is fine in dev, otherwise Sentry breadcrumbs.
@@ -157,7 +157,10 @@ export const LibraryStore = signalStore(
         patchState(store, { loading: false, error: error as ApiError });
       }
     },
-    setFilter<K extends keyof LibraryFilters>(key: K, value: LibraryFilters[K]) {
+    setFilter<K extends keyof LibraryFilters>(
+      key: K,
+      value: LibraryFilters[K],
+    ) {
       patchState(store, (s) => ({ filters: { ...s.filters, [key]: value } }));
     },
   })),
